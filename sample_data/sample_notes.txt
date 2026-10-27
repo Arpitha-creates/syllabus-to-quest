@@ -1,0 +1,56 @@
+Operating Systems - revision notes
+Prof. R. Menon | Semester 4 | Module notes for the internal exam
+
+A process is a program in execution with its own address space, program counter and registers.
+The operating system keeps a process control block for every process, which stores the process state, scheduling information, memory limits and open file descriptors.
+Process states move from new to ready, then running, then waiting, and finally terminated.
+A context switch saves the state of the running process and restores the state of the next process, and it is pure overhead because no user work happens during it.
+
+Threads are the unit of execution inside a process and share the address space, heap and open files of that process.
+Each thread keeps its own stack, registers and program counter.
+User-level threads are fast to create but one blocking call blocks the whole process, whereas kernel threads let the scheduler run them independently.
+Multithreading improves throughput for I/O-bound work and gives no benefit for pure CPU-bound work on a single core.
+
+CPU scheduling decides which ready process gets the processor next.
+First come first served is simple but suffers from the convoy effect, where short jobs wait behind a long one.
+Shortest job first is optimal for average waiting time but needs to know burst times in advance.
+Round robin gives every process a fixed time slice, which keeps response time fair for interactive systems.
+Priority scheduling can starve low priority processes, so ageing gradually raises the priority of waiting processes.
+Multilevel feedback queues adapt the time slice to observed process behaviour.
+
+Synchronisation protects shared data from concurrent modification.
+A race condition occurs when the result depends on the interleaving of two or more threads.
+A critical section is the code that touches shared state and must be executed by one thread at a time.
+Peterson's algorithm solves the two-process mutual exclusion problem using two shared flags and a turn variable.
+A mutex is a lock that only its owner can release, while a semaphore is a counter that any thread may signal.
+The producer consumer problem uses two semaphores, one counting filled slots and one counting empty slots, plus a mutex for the buffer.
+A monitor bundles shared data with the procedures that operate on it and guarantees mutual exclusion automatically.
+Deadlock needs four conditions at once: mutual exclusion, hold and wait, no preemption and circular wait.
+Deadlock is handled by prevention, avoidance through the banker's algorithm, detection with a wait-for graph, or simple recovery.
+
+Memory management gives each process the illusion of a large private address space.
+Paging divides memory into fixed size frames and the address space into pages of the same size, so allocation needs no external fragmentation.
+A page table maps virtual page numbers to physical frame numbers, and the TLB caches recent translations to avoid a memory lookup on every access.
+Demand paging loads a page only when it is first touched, which raises a page fault on the first access.
+Page replacement algorithms decide which page to evict when memory is full.
+FIFO replacement suffers from Belady's anomaly, where adding frames increases faults.
+LRU eviction uses recency of access and approximates well in practice with a reference bit and clock hand.
+Thrashing is the state where the system spends more time paging than executing, and it is fixed by working set control or by reducing the degree of multiprogramming.
+
+File systems organise persistent data into files and directories.
+An inode stores the metadata of a file, its size, permissions, timestamps and the block pointers, but not its name.
+A directory is a table mapping names to inode numbers.
+Contiguous allocation is fast to read but suffers from external fragmentation, while linked and indexed allocation avoid it.
+Journaling writes intent records before the real update so that a crash leaves the file system consistent.
+The disk scheduling algorithms are FCFS, SSTF, SCAN and C-SCAN, and SCAN is also called the elevator algorithm.
+
+Input output is handled by device drivers, interrupts and direct memory access.
+Polling wastes processor cycles while an interrupt lets the processor do useful work until the device signals completion.
+Direct memory access lets a controller move a block of data to memory without per-byte processor involvement.
+Buffering smooths out speed differences between the producer and the consumer of data.
+Spooling queues jobs for a device, which is how printers accept many jobs in sequence.
+
+Virtualisation and containers
+A virtual machine runs a complete guest operating system on emulated or paravirtualised hardware, which gives strong isolation at a high memory cost.
+A container shares the host kernel and isolates only the user space, so it starts in milliseconds and packs far more densely.
+Namespaces limit what a process can see, while cgroups limit how much CPU, memory and I/O it can consume.

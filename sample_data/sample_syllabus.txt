@@ -1,0 +1,98 @@
+B.Tech Computer Science - Semester 3
+Course: Data Structures and Algorithms (CS201)
+Credits: 4 | End-semester exam: 100 marks | Internal assessment: 50 marks
+
+Course objectives
+The course builds the ability to choose the right data structure for a problem,
+reason about the cost of an algorithm, and implement classic algorithms in Python.
+Students are expected to analyse time and space complexity before writing code.
+
+Unit 1: Complexity Analysis and Asymptotic Notation
+Asymptotic notation describes how the running time of an algorithm grows with input size.
+Big-O gives an upper bound, Big-Omega gives a lower bound, and Big-Theta gives a tight bound.
+Time complexity counts the dominant operations, while space complexity counts auxiliary memory.
+Amortised analysis averages the cost of a sequence of operations over that sequence.
+Recurrence relations are solved using the substitution method, the recursion tree method and the master theorem.
+Best case, average case and worst case must be reported separately for any algorithm.
+
+Unit 2: Arrays, Strings and Two-Pointer Techniques
+An array stores elements in contiguous memory so index access costs constant time.
+Dynamic arrays grow geometrically, which gives amortised constant time append but linear time insert in the middle.
+The two-pointer technique solves sorted-array problems such as pair sum and removing duplicates in linear time.
+Sliding window maintains a running aggregate over a contiguous subarray and avoids recomputation.
+Prefix sums answer range-sum queries in constant time after linear preprocessing.
+String matching is done with the KMP algorithm, whose failure function avoids re-scanning characters.
+
+Unit 3: Linked Lists and Pointer Discipline
+A singly linked list stores each element in a node that points to the next node.
+Insertion and deletion at a known node cost constant time, but search costs linear time.
+A doubly linked list keeps previous and next pointers, enabling backward traversal.
+Cycle detection uses Floyd's tortoise and hare algorithm with two pointers moving at different speeds.
+Reversing a linked list iteratively requires three pointers: previous, current and next.
+Sentinel nodes remove the special cases at the head and tail of a list.
+
+Unit 4: Stacks and Queues
+A stack follows last-in-first-out order and supports push, pop and peek in constant time.
+Stacks evaluate postfix expressions, check balanced brackets and drive depth-first search.
+A queue follows first-in-first-out order and supports enqueue and dequeue in constant time.
+A circular queue reuses freed slots by wrapping the rear index modulo the capacity.
+A deque supports insertion and deletion at both ends and is used in sliding-window maximum.
+A monotonic stack finds the next greater element for every position in linear time.
+
+Unit 5: Recursion and Backtracking
+Recursion solves a problem by reducing it to a smaller instance of the same problem.
+Every recursive function needs a base case and a progress step towards that base case.
+The call stack stores frames containing local variables and the return address.
+Backtracking explores candidates depth-first and abandons a branch as soon as it cannot succeed.
+N-Queens, Sudoku solving and subset generation are classic backtracking problems.
+Memoisation caches the results of subproblems and turns exponential recursion into polynomial time.
+
+Unit 6: Trees and Binary Search Trees
+A tree is a connected acyclic graph with a designated root node.
+In a binary search tree every key in the left subtree is smaller than the root and every key in the right subtree is larger.
+Search, insert and delete cost logarithmic time when the tree is balanced and linear time when it degenerates into a chain.
+Inorder traversal of a binary search tree visits keys in sorted order.
+Tree height, node count and diameter are computed with post-order recursion.
+A self-balancing tree such as the AVL tree restores balance with rotations after every modification.
+
+Unit 7: Heaps and Priority Queues
+A binary heap is a complete binary tree stored in an array where every parent dominates its children.
+A min-heap gives constant time access to the smallest element and logarithmic time insertion.
+Heapify builds a heap from an unordered array in linear time.
+Heapsort sorts in place in n log n time but is not stable.
+Priority queues schedule tasks, merge k sorted lists and drive Dijkstra's shortest path algorithm.
+A k-way merge of sorted streams uses a heap of size k to stay efficient.
+
+Unit 8: Graphs and Traversal Algorithms
+A graph is a set of vertices connected by edges and may be directed, undirected or weighted.
+Adjacency lists suit sparse graphs while adjacency matrices suit dense graphs.
+Breadth-first search explores level by level and finds shortest paths in unweighted graphs.
+Depth-first search explores as deep as possible and detects cycles and topological order.
+Topological sorting orders the vertices of a directed acyclic graph so every edge points forward.
+Dijkstra's algorithm computes single-source shortest paths for non-negative weights.
+Kruskal's and Prim's algorithms build a minimum spanning tree with a greedy strategy.
+Union-find with path compression detects cycles and tracks connected components efficiently.
+
+Unit 9: Hashing and Hash Tables
+A hash function maps a key to an index in a fixed-size table.
+Collisions are resolved by separate chaining or by open addressing with linear probing.
+A good load factor keeps probe sequences short and lookups close to constant time.
+Universal hashing makes the worst case unlikely for any fixed set of keys.
+Hash tables power frequency counting, deduplication and cache lookup.
+
+Unit 10: Sorting Algorithms Compared
+Bubble sort, insertion sort and selection sort run in quadratic time and are only useful for tiny inputs.
+Merge sort divides the array, sorts halves recursively and merges them in n log n time with linear extra space.
+Quicksort partitions around a pivot and is fast in practice but quadratic in the worst case.
+Randomised pivot selection makes the worst case very unlikely.
+Stability matters when records are sorted by a secondary key after a primary sort.
+Comparison sorting cannot beat n log n time, but counting sort and radix sort beat it for bounded integer keys.
+
+Recommended textbooks
+Introduction to Algorithms by Cormen, Leiserson, Rivest and Stein.
+Data Structures and Algorithm Analysis by Mark Allen Weiss.
+Problem Solving with Algorithms and Data Structures using Python by Miller and Ranum.
+
+Assessment pattern
+Continuous assessment consists of two quizzes, one programming assignment and one viva.
+The end-semester examination has three parts: short answers, design questions and one coding problem.
