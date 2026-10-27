@@ -17,13 +17,59 @@ front-end dependency and no external font or asset to fetch.
 from __future__ import annotations
 
 import datetime as dt
+import inspect
 import itertools
 import math
+import sys
 from pathlib import Path
 
-import streamlit as st
+# Work no matter which directory the app is started from.
+PROJECT_ROOT = Path(__file__).resolve().parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-from core import db, quest, service
+import streamlit as st  # noqa: E402  (imported after the sys.path fix)
+
+from core import db, quest, service  # noqa: E402
+
+
+# --------------------------------------------------------------------------- #
+# Guard: a Streamlit app must be started with `streamlit run`, not `python`.
+# VS Code's Run button does the latter, which serves nothing and only prints
+# "missing ScriptRunContext" warnings. Detect that and relaunch properly.
+# --------------------------------------------------------------------------- #
+def _running_under_streamlit() -> bool:
+    try:
+        from streamlit.runtime.scriptrunner import get_script_run_ctx
+
+        return get_script_run_ctx() is not None
+    except Exception:                      # very old / unexpected streamlit
+        return False
+
+
+def _relaunch_under_streamlit() -> None:
+    try:
+        from streamlit.web import cli as streamlit_cli
+    except ImportError:
+        print("\nStreamlit is not installed. From this folder, run:\n"
+              "    pip install -r requirements.txt\n"
+              "then start the app with:\n"
+              "    streamlit run app.py\n")
+        raise SystemExit(1)
+
+    print("\n" + "=" * 66)
+    print("  Syllabus to Quest is a Streamlit app, so it has to be started")
+    print("  with `streamlit run`, not `python app.py`.")
+    print("  Starting it properly for you now - your browser will open.")
+    print("  (In VS Code: press F5, or run `python run.py`.)")
+    print("=" * 66 + "\n")
+    sys.argv = ["streamlit", "run", str(Path(__file__).resolve())]
+    raise SystemExit(streamlit_cli.main())
+
+
+if not _running_under_streamlit():
+    _relaunch_under_streamlit()
+
 
 st.set_page_config(
     page_title="Syllabus to Quest",
@@ -31,9 +77,22 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-PROJECT_ROOT = Path(__file__).resolve().parent
 SAMPLE_DIR = PROJECT_ROOT / "sample_data"
 _GRADIENT_ID = itertools.count()
+
+
+def _stretch_kwargs(element) -> dict:
+    """Streamlit renamed use_container_width -> width='stretch'; support both."""
+    try:
+        if "width" in inspect.signature(element).parameters:
+            return {"width": "stretch"}
+    except (TypeError, ValueError):
+        pass
+    return {"use_container_width": True}
+
+
+STRETCH = _stretch_kwargs(st.button)
+DF_STRETCH = _stretch_kwargs(st.dataframe)
 
 KIND_TAG = {"briefing": "Briefing", "drill": "Drill", "boss": "Boss raid"}
 KIND_CLASS = {"briefing": "k-briefing", "drill": "k-drill", "boss": "k-boss"}
@@ -328,7 +387,7 @@ def render_question(conn, question, key_prefix: str, index: int | None = None,
 
     for position, option in enumerate(options):
         if st.button(option, key=f"{key_prefix}-opt-{question['id']}-{position}",
-                     width="stretch"):
+                     **STRETCH):
             result = service.answer(conn, question["id"], option)
             if result["xp_awarded"]:
                 st.toast(f"+{result['xp_awarded']} XP - level {result['level']}")
@@ -382,7 +441,7 @@ def page_forge(conn) -> None:
             "Operating Systems notes (prose)": "sample_notes.txt",
         }
         for label, filename in samples.items():
-            if st.button(label, key=f"sample-{filename}", width="stretch"):
+            if st.button(label, key=f"sample-{filename}", **STRETCH):
                 path = SAMPLE_DIR / filename
                 result = service.forge_file(conn, filename, path.read_bytes(), start=start)
                 st.session_state.doc_id = result["document_id"]
@@ -415,7 +474,7 @@ def page_forge(conn) -> None:
         [{"Unit": r["title"], "Weight": f'{r["weight"]}/5',
           "Questions": r["question_count"], "Extracted summary": r["summary"]}
          for r in rows],
-        hide_index=True, width="stretch",
+        hide_index=True, **DF_STRETCH,
     )
     if st.button("Open the quest board", type="primary"):
         st.session_state.nav = "Quest board"
@@ -495,7 +554,7 @@ def page_board(conn) -> None:
                 unsafe_allow_html=True,
             )
         label = "Revisit" if mission["status"] == "done" else "Open"
-        if right.button(label, key=f"open-{mission['id']}", width="stretch"):
+        if right.button(label, key=f"open-{mission['id']}", **STRETCH):
             st.session_state.active_mission = mission["id"]
             st.rerun()
 
@@ -660,7 +719,7 @@ def page_arena(conn) -> None:
             ("Accuracy", f'{round(100 * result["score"] / max(1, result["total"]))}%', "run"),
             ("Level", str(quest.level_for_xp(db.total_xp(conn))), "now"),
         ])
-        st.dataframe(result["detail"], hide_index=True, width="stretch")
+        st.dataframe(result["detail"], hide_index=True, **DF_STRETCH)
 
 
 # --------------------------------------------------------------------------- #
@@ -695,7 +754,7 @@ def page_plan(conn) -> None:
                 + f'<div class="s2q-muted">{(item["summary"] or "")[:180]}</div>'
                 "</div></div>", unsafe_allow_html=True,
             )
-        if right.button("Revised", key=f"rev-{item['id']}", width="stretch"):
+        if right.button("Revised", key=f"rev-{item['id']}", **STRETCH):
             outcome = service.complete_revision(conn, item["id"])
             nxt = outcome["next_due"] or "ladder finished"
             st.toast(f"+{outcome['xp_awarded']} XP - next review {nxt}")
@@ -733,7 +792,7 @@ def page_plan(conn) -> None:
         }
         for day in plan["days"] if not day["rest"]
     ]
-    st.dataframe(rows, hide_index=True, width="stretch", height=400)
+    st.dataframe(rows, hide_index=True, **DF_STRETCH, height=400)
     st.download_button("Download plan as CSV", data=_plan_csv(rows),
                        file_name="revision_plan.csv", mime="text/csv")
 
@@ -799,7 +858,7 @@ def page_profile(conn) -> None:
         st.dataframe(
             [{"When": row["created_at"].replace("T", " "), "XP": row["amount"],
               "Reason": row["reason"]} for row in history],
-            hide_index=True, width="stretch",
+            hide_index=True, **DF_STRETCH,
         )
     else:
         st.caption("No XP yet - answer a question on the quest board.")
